@@ -9,3 +9,7 @@ from rest_framework import viewsets
 class ActionsList(viewsets.ModelViewSet):
     queryset = Wallet.objects.all()
     serializer_class = WalletSerializer
+
+
+def index(request):
+    return render(request, 'index.html')
