@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-
+from datetime import timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -122,16 +122,31 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'moneyManagment.authentication.CookieJWTAuthentication',
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
         # 'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',  # разрешаем доступ всем
+        'rest_framework.permissions.IsAuthenticated',  # разрешаем доступ всем
     ],
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     # 'PAGE_SIZE': 10,  # Устанавливаем стандартный размер страницы — 10 записей
 }
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Время жизни access токена
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Время жизни refresh токена
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'username',
+    'USER_ID_CLAIM': 'user_id',
+}
+
+CSRF_COOKIE_SECURE = True  # Если ваше приложение работает через HTTPS
+CSRF_COOKIE_HTTPONLY = False  # Защищает токен от доступа через JavaScript (можно использовать для усиленной безопасности)
+CSRF_COOKIE_NAME = 'csrftoken'  # На всякий случай, если вам нужно переопределить название заголовка
 
 # CSRF_COOKIE_SECURE = False  # Для отключения CSRF на фронте (не рекомендуется для production)
 STATICFILES_DIRS = [

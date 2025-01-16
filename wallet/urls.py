@@ -8,6 +8,7 @@ default_router.register(r'wallet', views.ActionsList)
 urlpatterns = [
     path('', views.index, name='index'),  # Рендерим HTML-страницу
     path('', include(default_router.urls)),  # API
+    # path('home/', views.HomeView.as_view()),
     path('total/', views.WalletSumView.as_view()),
     path('wallet_record_list/', views.WalletShortList.as_view())
 ]

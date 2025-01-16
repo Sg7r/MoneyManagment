@@ -11,7 +11,7 @@ from rest_framework_simplejwt import views as jwt_views
 
 
 default_router = DefaultRouter()
-# default_router.register('api/wallet', ActionsList, 'actions_list')
+default_router.register('api/wallet', ActionsList, 'actions_list')
 default_router.register('api/monthly_bills', MonthlyBillsList, 'monthly_bills_list')
 # default_router.register('api/register', CreateUserView, 'Create_UserView')
 
@@ -19,6 +19,7 @@ default_router.register('api/monthly_bills', MonthlyBillsList, 'monthly_bills_li
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('wallet.urls')),  # Подключаем HTML-страницу
+
     # path('api/', include('accounts.urls')),
     path('api/users/', include('accounts.urls')),  # Подключаем HTML-страницу
     # path('login/', index, name='index'),  # Рендерим login - HTML-страницу
