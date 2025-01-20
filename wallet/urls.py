@@ -3,7 +3,8 @@ from . import views
 from rest_framework.routers import DefaultRouter
 
 default_router = DefaultRouter()
-default_router.register(r'wallet', views.ActionsList)
+default_router.register(r'wallet', views.ActionsList, basename='wallet'),
+default_router.register(r'anonymous_wallet', views.AnonymousList, basename='_anonymous_wallet')
 
 urlpatterns = [
     path('', views.index, name='index'),  # Рендерим HTML-страницу
