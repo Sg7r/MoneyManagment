@@ -136,7 +136,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Время жизни access токена
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Время жизни refresh токена
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Время жизни refresh токена
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
     'AUTH_HEADER_TYPES': ('Bearer',),
@@ -152,7 +152,13 @@ CSRF_COOKIE_NAME = 'csrftoken'  # На всякий случай, если ва�
 STATICFILES_DIRS = [
     BASE_DIR / "static",  # Например, если у вас есть папка static в корне проекта
 ]
-
-
 # MEDIA_URL = '/media/'  # URL to access media files in the browser
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # Physical directory on the server
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'

@@ -9,6 +9,9 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from django.db.models import Q
+from .tasks import delete_anonymous_records
+from datetime import datetime, timedelta
+from django.utils import timezone
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 from .pagination import CustomPageNumberPagination
@@ -68,6 +71,8 @@ class AnonymusList(APIView):
     authentication_classes = []
 
     def get(self, request, *args, **kwargs):
+
+        delete_anonymous_records_after_10_minutes()
         # Берем последние 10
         username = 'worker'
         worker = User.objects.get(username=username)
@@ -92,3 +97,10 @@ class AnonymusList(APIView):
 
 def index(request):
     return render(request, 'index.html', {'user': request.user})
+
+
+def delete_anonymous_records_after_10_minutes():
+    records_to_delete = Wallet.objects.filter(user__isnull=True).values_list('id', flat=True)
+    if records_to_delete.exists():
+        eta = timezone.now() + timedelta(seconds=300)
+        result = delete_anonymous_records.apply_async(args=[list(records_to_delete)], eta=eta)
