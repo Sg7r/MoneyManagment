@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <title>Wallet</title>
+</head>
+<body>
+    <h1><a href="/" style=" text-decoration: none; color:BLACK">THERE IS YOUR WAY TO SAVE MONEY</a></h1>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>

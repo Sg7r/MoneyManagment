@@ -1,0 +1,112 @@
+{% extends "Base.html" %}
+{% block content%}
+
+<h1> REGISTRATION</h1>
+<h2>Create new user</h2>
+<form onsubmit="event.preventDefault(); register();">
+    {% csrf_token %}
+    <input type="text" id="user" placeholder="user" required>
+    <input type="text" id="password" placeholder="password" required>
+    <input type="text" id="email" placeholder="email" required>
+    <button type="submit">Create USER</button>
+</form>
+<div id="errorModalRegister" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>Неверные данные для резистрации!</p>
+    </div>
+</div>
+<div id="Success" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>Вы успешно зарегестрировались!</p>
+        <p>Попробуйте залогиниться!</p>
+    </div>
+</div>
+
+
+
+<script>
+    function redirect() {
+        window.location.href = '../login_page/';
+    }
+
+    function showSuccessModal() {
+        const modal = document.getElementById("Success");
+        modal.style.display = "block"; // Показываем модальное окно
+
+        // Закрытие модального окна по клику на крестик
+        document.querySelector(".close").onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // Закрытие модального окна по клику вне его
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+                redirect();
+
+            }
+
+        }
+    };
+
+
+    function showErrorModal() {
+        const modal = document.getElementById("errorModalRegister");
+        modal.style.display = "block"; // Показываем модальное окно
+
+        // Закрытие модального окна по клику на крестик
+        document.querySelector(".close").onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // Закрытие модального окна по клику вне его
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+    };
+
+    // Function to create a new USER using the API
+    function register() {
+        const user = document.getElementById('user').value;
+        const password = document.getElementById('password').value;
+        const email = document.getElementById('email').value;
+
+        const obj_my = {
+              username: `{user}`,
+              password: `${password}`
+        };
+
+
+
+        fetch('../register/', {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json'
+
+            },
+            body: JSON.stringify({  username: user,
+                                    password: password,
+                                    email: email}),
+            })
+        .then(response => response.json())
+        .then(data => {
+            console.log('New user created:', data);
+            const status = data.message;
+            if (status == 'Registration successful') {
+                showSuccessModal();
+            } else {
+                const param = 'register'
+                showErrorModal();
+            };
+        })
+        .catch(error => console.error('Error creating book:', error));
+    }
+
+</script>
+
+
+{% endblock %}

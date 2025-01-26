@@ -1,0 +1,399 @@
+{% extends "Base.html" %}
+
+{% block content%}
+
+
+<h1>Wallet</h1>
+<div class="grid">
+    <div class="image">
+        <div id="auth-buttons">
+
+        </div>
+    </div>
+</div>
+
+<h2>Last 10 transaction</h2>
+<div id="warning" class="overview-mode">
+    <p>You aren`t logged in - you are in overview mode</p>
+</div>
+<div class="grid">
+    <div class="text" id="wallet-list">
+
+    </div>
+    <div id="filters">
+        <button id="show-filters-btn">Filters</button>
+        <button id="hide-filters-btn" style="display: none;">hide filters</button>
+        <div id = filter_container class="filter_container">
+            <form onsubmit="event.preventDefault(); apply_filters()">
+            {% csrf_token %}
+                <p>Find income or expence in range:</p>
+                <input type="number" id="low_range" placeholder="from">
+                <input type="number" id="max_range" placeholder="to">
+                <p>Find records based on Target that containce:</p>
+                <input type="text" id="target_filter" placeholder="Target">
+
+                <button type="submit">Apply filters</button>
+             </form>
+
+        </div>
+        <ul id="buttons">
+            <!-- List of books will be inserted here -->
+        </ul>
+    </div>
+</div>
+<div class="grid">
+    <div class="text">
+        <h2> Current wallet condition </h2>
+    </div>
+    <div id="image">
+        <ul id="total">
+            <!-- List of books will be inserted here -->
+        </ul>
+    </div>
+</div>
+
+<h2>Add an income or expences</h2>
+<form onsubmit="event.preventDefault(); createRecord()">
+    {% csrf_token %}
+    <input type="number" id="income_or_expence" placeholder="income or expence" required>
+    <input type="text" id="target" placeholder="Target" required>
+    <button type="submit">Add record</button>
+</form>
+
+<div id="editRecord" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <form onsubmit="event.preventDefault(); editRecordPatch()">
+            {% csrf_token %}
+            <input type="number" id="income_or_expence_edit" placeholder="income or expence" required>
+            <input type="text" id="target_edit" placeholder="Target" required>
+            <input type="hidden" id="reference_to_record_id" value="">
+            <button type="submit">Add record</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    document.getElementById("show-filters-btn").addEventListener("click", function() {
+        document.getElementById("filter_container").style.display = "block";
+        document.getElementById("show-filters-btn").style.display = "none";
+        document.getElementById("hide-filters-btn").style.display = "block";
+    });
+
+    document.getElementById("hide-filters-btn").addEventListener("click", function() {
+        document.getElementById("filter_container").style.display = "none";
+        document.getElementById("show-filters-btn").style.display = "block";
+        document.getElementById("hide-filters-btn").style.display = "none";
+    });
+
+
+
+    function getCSRFToken() {
+        const name = "csrftoken";
+        const value = document.cookie.split(';').find(cookie => cookie.trim().startsWith(name + "="));
+        return value ? value.split('=')[1] : null;
+    }
+
+    function getJWTToken() {
+        const name = "access_token";
+        const value = document.cookie.split(';').find(cookie => cookie.trim().startsWith(name + "="));
+        return value ? value.split('=')[1] : null;
+    }
+
+    const jwtToken = getJWTToken();
+    const authButtonsContainer = document.getElementById('auth-buttons');
+    const listButtonsContainer = document.getElementById('buttons');
+    let request_param = null;
+
+    if (jwtToken) {
+        const logoutButton = document.createElement('button');
+        logoutButton.textContent = 'Logout';
+        logoutButton.onclick = function() {
+            // Логика для выхода (удаление токена)
+            document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+            window.location.href = '';  // Перенаправление на главную страницу
+            };
+
+        authButtonsContainer.appendChild(logoutButton);
+
+   } else {
+       const loginButton = document.createElement('button');
+       const registrationButton = document.createElement('button');
+       loginButton.textContent = 'Login';
+       registrationButton.textContent = 'Registration';
+       loginButton.onclick = function() {
+       // Логика для выхода (удаление токена)
+            window.location.href = 'users/login_page/';  // Перенаправление на главную страницу
+            };
+       registrationButton.onclick = function() {
+            // Логика для выхода (удаление токена)
+            window.location.href = 'users/register/';  // Перенаправление на главную страницу
+            };
+       authButtonsContainer.appendChild(loginButton);
+       authButtonsContainer.appendChild(registrationButton);
+   }
+
+   function addButtons(parent_div, record_id){
+       const walletItemButton = document.createElement('div');
+       walletItemButton.classList.add('image', record_id);
+       const deleteButton = document.createElement('button');
+       const editButton = document.createElement('button');
+
+       deleteButton.textContent = 'Delete record';
+       editButton.textContent = 'Edit record';
+         // Логика для удаления записи
+       deleteButton.onclick = function() {
+           deleteRecord(record_id);
+       };
+       walletItemButton.appendChild(deleteButton);
+
+        // Логика для изменения записи
+       editButton.onclick = function() {
+           editRecord(record_id);
+            };
+
+       walletItemButton.appendChild(editButton);
+       parent_div.appendChild(walletItemButton);
+   }
+
+   // Function to delete record
+    function deleteRecord(record_id) {
+        const csrfToken = getCSRFToken();
+        console.log(record_id);
+        const record_id_const = record_id
+
+        const options_post = {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`,  // Передаем токен в заголовке Authorization
+                'Content-Type': 'application/json',  // Указываем, что отправляем данные в формате JSON
+                'X-CSRFToken': csrfToken
+                },
+       };
+
+        if (jwtToken != null) {
+            path = `/api/wallet/${record_id_const}/`
+        } else {
+            path = `/api/anonymous_wallet/${record_id}/`
+        };
+
+        fetch(path, options_post)
+        .then(data => {
+            console.log('Record was deleted:', data);
+            fetchWallet();  // Refresh the list of books
+        })
+        .catch(error => console.error('Error delete record:', error));
+    }
+
+
+
+
+    function editRecord(record_id) {
+
+        const csrfToken = getCSRFToken();
+
+        const record = document.getElementById(record_id).innerText;
+        const recordsList = record.split(',');
+
+        const Amount = recordsList.find(item => item.trim().startsWith('Amount'));
+        const Target = recordsList.find(item => item.trim().startsWith('Target'));
+
+        let amountValue;
+        let targetValue;
+
+        if (Amount && Target) {
+            amountValue = parseInt(Amount.split(':')[1].trim());
+            targetValue = Target.split(':')[1].trim();
+        } else {
+            console.log('Amount or Target не найден');
+        };
+
+        document.getElementById('income_or_expence_edit').value = parseInt(amountValue,10);
+        document.getElementById('target_edit').value = targetValue;
+        document.getElementById('reference_to_record_id').value = record_id;
+
+
+        const modal = document.getElementById("editRecord");
+        modal.style.display = "block"; // Показываем модальное окно
+
+        // Закрытие модального окна по клику на крестик
+        document.querySelector(".close").onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // Закрытие модального окна по клику вне его
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+    }
+
+
+
+    function editRecordPatch() {
+        const income_or_expence = document.getElementById('income_or_expence_edit').value;
+        const target = document.getElementById('target_edit').value;
+        const csrfToken = getCSRFToken();
+        const record_id = document.getElementById('reference_to_record_id').value;
+
+        const options_post = {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`,  // Передаем токен в заголовке Authorization
+                'Content-Type': 'application/json',  // Указываем, что отправляем данные в формате JSON
+                'X-CSRFToken': csrfToken
+                },
+            body: JSON.stringify({
+                "income_or_expence": income_or_expence,
+                "target": target,
+                }),
+        };
+
+        if (jwtToken != null) {
+            path = `/api/wallet/${record_id}/`;
+        } else {
+            path = `/api/anonymous_wallet/${record_id}/`;
+        };
+
+        fetch(path, options_post)
+        .then(response => response.json())
+        .then(data => {
+            console.log('record was changed:', data);
+            const modal = document.getElementById("editRecord");
+            modal.style.display = "None";
+            fetchWallet();  // Refresh the list of books
+        })
+        .catch(error => console.error('Error creating book:', error));
+
+    }
+
+
+
+
+
+    // Function to fetch and display records from the API
+
+
+    function fetchWallet(request_param) {
+        const options = {
+            method: 'GET',  // Или 'POST', в зависимости от вашего запроса
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`,  // Передаем токен в заголовке Authorization
+                'Content-Type': 'application/json'  // Указываем, что отправляем данные в формате JSON
+            }
+        };
+
+        let path;
+        if (jwtToken != null) {path = "/api/wallet_record_list/"
+        } else {
+            path = "/api/anonymous_record_list/";
+            const warning = document.getElementById("warning");
+            warning.style.display = "block"};
+        console.log(request_param)
+        if (request_param) {
+            path = `${path}${request_param}`
+        };
+        console.log(path)
+
+        fetch(path, options)
+            .then(response => response.json())
+            .then(data => {
+                const walletList = document.getElementById('wallet-list');
+                walletList.innerHTML = ''; // Clear existing list
+
+                data.records.forEach(wallet => {
+                    const parentDiv = document.createElement('div');
+                    parentDiv.classList.add('grid');
+
+                    const walletItem = document.createElement('div');
+                    walletItem.id = wallet.id;
+                    walletItem.textContent = `Amount: ${wallet.income_or_expence},
+                                              Target: ${wallet.target},
+                                              Date: ${wallet.data},
+                                              User: ${wallet.user}`;
+
+                    parentDiv.appendChild(walletItem);
+                    walletList.appendChild(parentDiv);
+
+                    addButtons(parentDiv, wallet.id);
+
+                });
+
+                const totalList = document.getElementById('total');
+                totalList.innerHTML = ''; // Clear existing list
+                const total_item = document.createElement('li');
+                total_item.textContent = `${data.total}`;
+
+                totalList.appendChild(total_item);
+
+            })
+
+            .catch(error => console.error('Error fetching books:', error));
+
+
+
+    }
+
+    function form_filters_request() {
+        const filter_from = document.getElementById('low_range').value;
+        const filter_to = document.getElementById('max_range').value;
+        const filter_target = document.getElementById('target_filter').value;
+
+        let path_filter = `?low_range=${filter_from}&max_range=${filter_to}&target=${filter_target}`;
+        return path_filter;
+    }
+
+
+     function apply_filters() {
+        let request_param = form_filters_request();
+        fetchWallet(request_param);
+
+     }
+
+
+    // Function to create a record using the API
+    function createRecord() {
+        const income_or_expence = document.getElementById('income_or_expence').value;
+        const target = document.getElementById('target').value;
+        const csrfToken = getCSRFToken();
+
+        const options_post = {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`,  // Передаем токен в заголовке Authorization
+                'Content-Type': 'application/json',  // Указываем, что отправляем данные в формате JSON
+                'X-CSRFToken': csrfToken,
+                },
+            body: JSON.stringify({
+                "income_or_expence": income_or_expence,
+                "target": target,
+                }),
+        };
+
+        if (jwtToken != null) { path = "/api/wallet/"
+        } else {
+            path = "/api/anonymous_wallet/"
+        };
+
+        fetch(path, options_post)
+        .then(response => response.json())
+        .then(data => {
+            console.log('New book created:', data);
+            fetchWallet();  // Refresh the list of books
+        })
+        .catch(error => console.error('Error creating book:', error));
+    }
+
+    // Load books when the page is loaded
+    window.onload = fetchWallet(request_param);
+
+    function login() {
+        window.location.href = 'users/login_page/'}
+
+
+</script>
+
+
+{% endblock %}

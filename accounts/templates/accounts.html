@@ -1,0 +1,95 @@
+{% extends "Base.html" %}
+
+{% block content%}
+
+
+<h1>LOGIN</h1>
+
+<h2>Login</h2>
+<form onsubmit="event.preventDefault(); login();">
+    {% csrf_token %}
+    <input type="text" id="user" placeholder="user" required>
+    <input type="text" id="password" placeholder="password" required>
+    <button type="submit">Login</button>
+</form>
+<div id="errorModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>Неверные данные для входа!</p>
+    </div>
+</div>
+
+
+<script>
+
+    function showErrorModal() {
+        const modal = document.getElementById("errorModal");
+        modal.style.display = "block"; // Показываем модальное окно
+
+        // Закрытие модального окна по клику на крестик
+        document.querySelector(".close").onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // Закрытие модального окна по клику вне его
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+    };
+
+     // Function to LOGIN using the API
+    function login() {
+        const user = document.getElementById('user').value;
+        const password = document.getElementById('password').value;
+
+        function getCSRFToken() {
+            var csrfToken = null;
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.startsWith('csrftoken=')) {
+                    csrfToken = cookie.substring('csrftoken='.length, cookie.length);
+                    break;
+                    }
+                }
+            return csrfToken;
+        };
+        if (user == '') {
+            return;
+            }
+
+        const options_post = {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken(),
+                'Content-Type': 'application/json'  // Указываем, что отправляем данные в формате JSON
+            },
+            body: JSON.stringify({  'username': user,
+                                    'password': password,
+
+            }),
+        };
+
+        fetch('../login/', options_post)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Login sucsesfull:', data);
+            const status = data.message;
+            if (status == 'Login successful') {
+                window.location.href = '../../'
+                }
+            else {
+                showErrorModal();
+            };
+
+        })
+        .catch(error => console.error('Error login:', error));
+    }
+    window.onload = login;
+
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,204 @@
+h1 {
+    font-size: 48px;
+    color: white;
+    background-color: #002BFF;  /* Цвет фона */
+    background-color: #25634F;  /* Цвет фона */
+    padding: 10px;               /* Внутренние отступы */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Тень текста */
+    border-radius: 5px;          /* Закругленные углы */
+    text-align: center
+}
+
+h2 {
+    font-size: 2rem; /* Размер шрифта */
+    font-weight: 600; /* Полужирный шрифт */
+    color: #333; /* Темно-серый цвет текста */
+    margin-bottom: 1rem; /* Отступ снизу */
+    line-height: 1.4; /* Высота строки для лучшего восприятия */
+}
+
+/* Подзаголовок с эффектом тени */
+h2.shadow {
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень */
+}
+
+h2.beautiful {
+
+    font-size: 2.4rem; /* Крупный шрифт */
+    font-weight: bold; /* Жирный текст */
+    text-transform: uppercase; /* Преобразование текста в верхний регистр */
+    color: #000; /* Белый цвет текста */
+    background: linear-gradient(45deg, #f39c12, #e74c3c, #8e44ad); /* Градиент от желтого к пурпурному */
+    background-clip: text; /* Применение градиента к тексту */
+    -webkit-background-clip: text; /* Для браузеров, поддерживающих Webkit */
+    letter-spacing: 2px; /* Увеличенное расстояние между буквами */
+    padding-bottom: 5px; /* Отступ снизу */
+    position: relative;
+}
+
+h2.beautiful.a{
+    text-decoration: none;  /* Убирает подчеркивание */
+    color: black;  /* Устанавливает черный цвет для текста ссылки */}
+
+/* Плавная тень для текста */
+h2.beautiful::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 5px;
+    background: rgba(0, 0, 0, 0.2); /* Легкая тень под текстом */
+    border-radius: 2px;
+}
+
+/* Плавный эффект при наведении */
+h2.beautiful:hover {
+    transform: scale(1.05); /* Увеличение текста при наведении */
+    transition: transform 0.3s ease; /* Плавный переход */
+}
+
+element.style {
+    display: flex;
+}
+
+.grid {
+    display: flex;        /* Включаем Flexbox */
+}
+
+.text {
+    width: 65%;           /* Можно задать фиксированную ширину, либо использовать проценты */
+    padding: 10px;
+    text-align: left;
+}
+
+.image {
+    min-width: 25%;           /* Можно задать фиксированную ширину, либо использовать проценты */
+    padding: 10px;
+    background-color: lightblue;
+    text-align: center;
+    margin-left: auto; /* Выталкивает блок вправо */
+ }
+
+.reg-button{
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+ .to-registration-form {
+    width: 20%;
+    justify-content: flex-end;
+    padding: 12px;
+    background-color: #1a1bf0;
+    border: none;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+ }
+
+ .to-registration-form:hover {
+    background-color: #4a8cdb;
+}
+
+.to-registration-form:active {
+    background-color: #987bb0;
+}
+.text_footer {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    width: 45%;           /* Можно задать фиксированную ширину, либо использовать проценты */
+    padding: 10px;
+    text-align: center;
+}
+
+button.button_reaction{
+    display: flex;
+    align-items: center;  /* Вертикальное выравнивание текста */
+    justify-content: center;
+    width: 10%;
+    height: 50%;
+    margin-left: 5%;
+    padding: 12px;
+    background-color: #1af0ba;
+    border: none;
+    color: black;
+    font-size: 30px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.List_comments{
+   display: flex;
+   justify-content: left; /* Выравнивание по горизонтали */
+   align-items: center;
+   height: 2em;
+
+
+}
+.helpful{
+    padding:2%
+}
+
+.overview-mode{
+    width: 50%;           /* Можно задать фиксированную ширину, либо использовать проценты */
+    padding: 10px;
+    background-color: yellow;
+    text-align: center;
+    margin-right: auto;
+    display: none;
+    color: red;
+
+}
+
+
+
+
+
+
+/* Стили для модального окна */
+.modal {
+    display: none; /* Скрыто по умолчанию */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+.filter_container{
+    display: none;
+
+}
