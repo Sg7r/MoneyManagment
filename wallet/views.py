@@ -15,6 +15,7 @@ from django.utils import timezone
 from .filters import WalletFilter
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
+
 from .pagination import CustomPageNumberPagination
 
 
@@ -23,7 +24,6 @@ class ActionsList(viewsets.ModelViewSet):
 
     queryset = Wallet.objects.all()
     serializer_class = WalletSerializer
-
 
 
 class AnonymousList(viewsets.ModelViewSet):
@@ -43,12 +43,10 @@ class AnonymousList(viewsets.ModelViewSet):
         return Response(status=status.HTTP_403_FORBIDDEN)
 
 
-
-
-class WalletShortList(APIView):
+class WalletList(APIView):
     permission_classes = [IsAuthenticated]
 
-    filter_backends = [DjangoFilterBackend]
+    pagination_class = CustomPageNumberPagination
     filterset_class = WalletFilter
 
     def apply_filters(self, request, queryset):
@@ -56,37 +54,43 @@ class WalletShortList(APIView):
         filter_backend = DjangoFilterBackend()
         # Применяем фильтрацию с помощью filterset_class
         return filter_backend.filter_queryset(request, queryset, self)
+
     def get(self, request, *args, **kwargs):
-        # Берем последние 10>\
+
         user = request.user
-        queryset = Wallet.objects.filter(user=user).order_by('-data')
+        user_all_objects = Wallet.objects.filter(user=user)
 
+        queryset =user_all_objects.order_by('-data')
         queryset = self.apply_filters(request, queryset)
-        short_list = queryset[:10]
 
-        aggregation_data = Wallet.objects.filter(user=user).aggregate(
+        paginator = CustomPageNumberPagination()
+        record_list = paginator.paginate_queryset(queryset, request)
+
+        serializer = WalletSerializer(record_list, many=True)
+
+        aggregation_data = user_all_objects.aggregate(
             total_price=Sum('income_or_expence')
         )
         total = aggregation_data['total_price']
 
-        # Если сумма равна None (если продуктов нет), то ставим 0
         if total is None:
             total = 0
 
-        serializer = WalletSerializer(short_list, many=True)
-        # Возвращаем результат через сериализатор
-        return Response({
-            'records': serializer.data,
-            'total': total
-        }, status=status.HTTP_200_OK)
+        additional_data = {
+            'total': total,
+        }
+
+        paginate_response = paginator.get_paginated_response(serializer.data)
+        response_data = {**paginate_response.data, **additional_data}
+
+        return Response(response_data)
 
 
 class AnonymusList(APIView):
     permission_classes = []
     authentication_classes = []
 
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = WalletFilter
+    pagination_class = CustomPageNumberPagination
 
     def apply_filters(self, request, queryset):
         """Применяем фильтры вручную."""
@@ -95,7 +99,6 @@ class AnonymusList(APIView):
         return filter_backend.filter_queryset(request, queryset, self)
 
     def get(self, request, *args, **kwargs):
-
         delete_anonymous_records_after_10_minutes()
         # Берем последние 10
         username = 'worker'
@@ -103,24 +106,26 @@ class AnonymusList(APIView):
         queryset = Wallet.objects.filter(Q(user=worker) | Q(user__isnull=True)).order_by('-data')
 
         queryset = self.apply_filters(request, queryset)
-        short_list = queryset[:10]
-
+        paginator = CustomPageNumberPagination()
+        record_list = paginator.paginate_queryset(queryset, request)
+        serializer = WalletSerializer(record_list, many=True)
         # Вычисляем тотал
         aggregation_data = Wallet.objects.filter(Q(user=worker) | Q(user__isnull=True)).aggregate(
             total_price=Sum('income_or_expence')
         )
         total = aggregation_data['total_price']
 
-        # Если сумма равна None (если продуктов нет), то ставим 0
         if total is None:
             total = 0
 
-        records_serializer = WalletSerializer(short_list, many=True)
+        additional_data = {
+            'total': total,
+        }
 
-        return Response({
-            'records': records_serializer.data,
-            'total': total
-        }, status=status.HTTP_200_OK)
+        paginate_response = paginator.get_paginated_response(serializer.data)
+        response_data = {**paginate_response.data, **additional_data}
+
+        return Response(response_data)
 
 
 def index(request):
@@ -132,5 +137,3 @@ def delete_anonymous_records_after_10_minutes():
     if records_to_delete.exists():
         eta = timezone.now() + timedelta(seconds=300)
         result = delete_anonymous_records.apply_async(args=[list(records_to_delete)], eta=eta)
-
-

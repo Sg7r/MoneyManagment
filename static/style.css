@@ -15,6 +15,7 @@ h2 {
     color: #333; /* Темно-серый цвет текста */
     margin-bottom: 1rem; /* Отступ снизу */
     line-height: 1.4; /* Высота строки для лучшего восприятия */
+    width: max-content;
 }
 
 /* Подзаголовок с эффектом тени */
@@ -58,12 +59,77 @@ h2.beautiful:hover {
     transition: transform 0.3s ease; /* Плавный переход */
 }
 
+.main_container {
+    display: flex;        /* Включаем Flexbox */
+    margin: 1% 3% 1% 3% ;
+    flex-direction: column;
+
+}
+
+.left-column {
+    display: flex;
+    width: 70%;
+    justify-content: space-between;
+    align-items: flex-start:
+
+}
+
+.change-flex-direction {
+    flex-direction: column;
+}
+
+.change-width-to-100 {
+    width: 100%;
+}
+
+.change-justify-content {
+    justify-content: flex-start;
+}
+
+
+.right-column {
+    display: flex;
+    width: 30%;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-start:
+}
+
+
+.half-left {
+    display: flex;
+    max-width: 100%;
+    min-width: 70%;
+    flex-direction: row;
+
+    justify-content: space-between;
+    align-items: center:
+
+
+}
+
 element.style {
     display: flex;
+    justify-content: center; /* Centers the items horizontally */
+    padding: 20px;
 }
 
 .grid {
     display: flex;        /* Включаем Flexbox */
+    width: 100%;
+    padding-bottom: 1%;
+    justify-content: flex-start; /* Centers the items horizontally */
+    align-items: flex-start;
+    flex-wrap: wrap; /* Allows items to wrap into the next row */
+
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    padding: 0 2%;
+
+
 }
 
 .text {
@@ -73,12 +139,53 @@ element.style {
 }
 
 .image {
-    min-width: 25%;           /* Можно задать фиксированную ширину, либо использовать проценты */
+    display: flex;
+    min-width: 15%;           /* Можно задать фиксированную ширину, либо использовать проценты */
+    max-width: 25%;
     padding: 10px;
+    text-align: center;
+    align-items: center;
+    justify-content: space-around;
     background-color: lightblue;
     text-align: center;
     margin-left: auto; /* Выталкивает блок вправо */
  }
+
+ .background {
+    display: flex;
+    min-width: 10%;
+    padding: 0 5%;
+    text-align: center;
+    align-items: center;
+    justify-content: flex-end ;
+    background-color: lightblue;
+    text-align: center;
+ }
+
+.grid_middle_elem {
+    min-width: 25%;           /* Можно задать фиксированную ширину, либо использовать проценты */
+    padding: 10px;
+    text-align: center;
+    align-items: center;
+    background-color: #FFCCCB;
+    text-align: center;
+    margin-left: 15px; /* Выталкивает блок вправо */
+}
+
+ ul.ul_elem {
+    display: flex;
+    flex-direction: column; /* располагать элементы по вертикали */
+    justify-content: center; /* выравнивание по вертикали */
+ }
+
+.basic-button {
+    display: flex;
+    width: auto;
+    white-space: nowrap;
+    margin: 2%;
+
+}
+
 
 .reg-button{
     display: flex;
@@ -147,13 +254,14 @@ button.button_reaction{
 }
 
 .overview-mode{
-    width: 50%;           /* Можно задать фиксированную ширину, либо использовать проценты */
+    display: flex;/* Можно задать фиксированную ширину, либо использовать проценты */
     padding: 10px;
     background-color: yellow;
     text-align: center;
     margin-right: auto;
     display: none;
     color: red;
+    align-items: center:
 
 }
 

@@ -4,61 +4,112 @@
 
 
 <h1>Wallet</h1>
-<div class="grid">
-    <div class="image">
-        <div id="auth-buttons">
+
+<div class="main_container">
+    <div class="grid">
+        <div class="left-column">
+            <div id="warning" class="overview-mode">
+                <p>You aren`t logged in - you are in overview mode. Yours records will be keep 3 minutes</p>
+             </div>
+        </div>
+        <div class="right-column">
+             <div id="auth-buttons" class="background">
+             </div>
+        </div>
+     </div>
+
+    <div class="grid">
+        <div class="left-column">
+                <div class="item">
+                    <h2>Last 10 transaction</h2>
+                </div>
+                <div class="item">
+                    <button id="paginator_view">Show all records</button>
+                </div>
+        </div>
+        <div class="right-column">
+        </div>
+
+    </div>
+
+    <div class="grid">
+        <div class="left-column" id="wallet-list">
 
         </div>
-    </div>
-</div>
+        <div class="right-column, change-flex-direction" id="filters">
+            <button class="basic-button" id="show-filters-btn">Filters</button>
+            <button class="basic-button" id="hide-filters-btn" style="display: none;">hide filters</button>
+            <div id = filter_container class="filter_container">
+                <form onsubmit="event.preventDefault(); apply_filters()">
+                {% csrf_token %}
+                    <p>Find income or expence in range:</p>
+                    <input type="number" id="low_range" placeholder="from">
+                    <input type="number" id="max_range" placeholder="to">
+                    <p>Find records based on Target that containce:</p>
+                    <input type="text" id="target_filter" placeholder="Target">
 
-<h2>Last 10 transaction</h2>
-<div id="warning" class="overview-mode">
-    <p>You aren`t logged in - you are in overview mode</p>
-</div>
-<div class="grid">
-    <div class="text" id="wallet-list">
+                    <button type="submit">Apply filters</button>
+                 </form>
 
-    </div>
-    <div id="filters">
-        <button id="show-filters-btn">Filters</button>
-        <button id="hide-filters-btn" style="display: none;">hide filters</button>
-        <div id = filter_container class="filter_container">
-            <form onsubmit="event.preventDefault(); apply_filters()">
-            {% csrf_token %}
-                <p>Find income or expence in range:</p>
-                <input type="number" id="low_range" placeholder="from">
-                <input type="number" id="max_range" placeholder="to">
-                <p>Find records based on Target that containce:</p>
-                <input type="text" id="target_filter" placeholder="Target">
-
-                <button type="submit">Apply filters</button>
-             </form>
-
+            </div>
+            <ul id="buttons">
+                <!-- List of books will be inserted here -->
+            </ul>
         </div>
-        <ul id="buttons">
-            <!-- List of books will be inserted here -->
-        </ul>
     </div>
+
+    <div class="grid">
+        <div class="left-column">
+            <div class="item">
+                <button class="basic-button " id="previous_page" value="">Previous page</button>
+                <button class="basic-button " id="next_page" value="">Next page</button>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="grid">
+        <div class="left-column">
+            <div class="item">
+                <h2>Current wallet condition </h2>
+            </div>
+            <div class="item">
+                  <div class="background">
+                    <ul id="total" class="ul_elem">
+                        <!-- List of books will be inserted here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="grid">
+    <div class="left-column, change-flex-direction">
+        <div class="item">
+            <h2> Add an income or expenses</h2>
+        </div>
+
+        <div class="item">
+
+            <form onsubmit="event.preventDefault(); createRecord()">
+                {% csrf_token %}
+                <div class="item">
+                    <input type="number" id="income_or_expence" placeholder="income or expence" required>
+                    <input type="text" id="target" placeholder="Target" required>
+                    <button class="basic-button" type="submit">Add record</button>
+                </div>
+            </form>
+        </div>
 </div>
-<div class="grid">
-    <div class="text">
-        <h2> Current wallet condition </h2>
-    </div>
-    <div id="image">
-        <ul id="total">
-            <!-- List of books will be inserted here -->
-        </ul>
-    </div>
 </div>
 
-<h2>Add an income or expences</h2>
-<form onsubmit="event.preventDefault(); createRecord()">
-    {% csrf_token %}
-    <input type="number" id="income_or_expence" placeholder="income or expence" required>
-    <input type="text" id="target" placeholder="Target" required>
-    <button type="submit">Add record</button>
-</form>
+</div>
+
+
+
 
 <div id="editRecord" class="modal">
     <div class="modal-content">
@@ -87,7 +138,25 @@
         document.getElementById("hide-filters-btn").style.display = "none";
     });
 
+    document.getElementById("next_page").addEventListener("click", function() {
+         const path_url = document.getElementById('next_page').value;
+         console.log(path_url);
+         const urlObj = new URL(path_url);
+         const queryParams = urlObj.search;
 
+         fetchWallet(queryParams);
+
+        });
+
+    document.getElementById("previous_page").addEventListener("click", function() {
+         const path_url = document.getElementById('previous_page').value;
+         console.log(path_url);
+         const urlObj = new URL(path_url);
+         const queryParams = urlObj.search;
+
+         fetchWallet(queryParams);
+
+        });
 
     function getCSRFToken() {
         const name = "csrftoken";
@@ -120,6 +189,8 @@
    } else {
        const loginButton = document.createElement('button');
        const registrationButton = document.createElement('button');
+       loginButton.classList.add('basic-button');
+       registrationButton.classList.add('basic-button');
        loginButton.textContent = 'Login';
        registrationButton.textContent = 'Registration';
        loginButton.onclick = function() {
@@ -136,9 +207,11 @@
 
    function addButtons(parent_div, record_id){
        const walletItemButton = document.createElement('div');
-       walletItemButton.classList.add('image', record_id);
+       walletItemButton.classList.add('item', record_id);
        const deleteButton = document.createElement('button');
        const editButton = document.createElement('button');
+       deleteButton.classList.add('basic-button');
+       editButton.classList.add('basic-button');
 
        deleteButton.textContent = 'Delete record';
        editButton.textContent = 'Edit record';
@@ -291,23 +364,25 @@
             path = "/api/anonymous_record_list/";
             const warning = document.getElementById("warning");
             warning.style.display = "block"};
-        console.log(request_param)
+
         if (request_param) {
             path = `${path}${request_param}`
         };
-        console.log(path)
+
 
         fetch(path, options)
             .then(response => response.json())
             .then(data => {
                 const walletList = document.getElementById('wallet-list');
                 walletList.innerHTML = ''; // Clear existing list
+                walletList.classList.add('change-flex-direction');
 
-                data.records.forEach(wallet => {
+                data.results.forEach(wallet => {
                     const parentDiv = document.createElement('div');
-                    parentDiv.classList.add('grid');
+                    parentDiv.classList.add('left-column', 'change-width-to-100');
 
                     const walletItem = document.createElement('div');
+                    walletItem.classList.add('item');
                     walletItem.id = wallet.id;
                     walletItem.textContent = `Amount: ${wallet.income_or_expence},
                                               Target: ${wallet.target},
@@ -319,6 +394,7 @@
 
                     addButtons(parentDiv, wallet.id);
 
+
                 });
 
                 const totalList = document.getElementById('total');
@@ -327,6 +403,10 @@
                 total_item.textContent = `${data.total}`;
 
                 totalList.appendChild(total_item);
+
+                document.getElementById('previous_page').value = data.previous
+                document.getElementById('next_page').value = data.next
+
 
             })
 

@@ -135,7 +135,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',  # Подключаем фильтрацию
     ],
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     # 'PAGE_SIZE': 10,  # Устанавливаем стандартный размер страницы — 10 записей
 }
 
@@ -175,3 +175,8 @@ EMAIL_USE_TLS = True  # Включаем использование TLS для �
 EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 DEFAULT_FROM_EMAIL = os.environ['EMAIL_HOST_USER']  # От какого адреса будут отправляться письма
+
+
+
+def __init__(self):
+    self.active_connections: Dict[str, Websocket] = {}
