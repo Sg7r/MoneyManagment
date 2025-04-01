@@ -58,6 +58,8 @@
         </div>
     </div>
 
+
+
     <div class="grid">
         <div class="left-column">
             <div class="item">
@@ -108,7 +110,7 @@
 
 </div>
 
-
+<div id="errorIcon" class="error-icon">❌ No permissions for not logged user</div>
 
 
 <div id="editRecord" class="modal">
@@ -119,7 +121,9 @@
             <input type="number" id="income_or_expence_edit" placeholder="income or expence" required>
             <input type="text" id="target_edit" placeholder="Target" required>
             <input type="hidden" id="reference_to_record_id" value="">
-            <button type="submit">Add record</button>
+            <button type="submit">Edit record</button>
+
+
         </form>
     </div>
 </div>
@@ -304,43 +308,71 @@
     }
 
 
+     function showError() {
+    const errorIcon = document.getElementById('errorIcon');
 
-    function editRecordPatch() {
-        const income_or_expence = document.getElementById('income_or_expence_edit').value;
-        const target = document.getElementById('target_edit').value;
-        const csrfToken = getCSRFToken();
-        const record_id = document.getElementById('reference_to_record_id').value;
+    // Показываем крестик
+    errorIcon.classList.add('show-error');
 
-        const options_post = {
-            method: 'PATCH',
-            headers: {
-                'Authorization': `Bearer ${jwtToken}`,  // Передаем токен в заголовке Authorization
-                'Content-Type': 'application/json',  // Указываем, что отправляем данные в формате JSON
-                'X-CSRFToken': csrfToken
-                },
-            body: JSON.stringify({
-                "income_or_expence": income_or_expence,
-                "target": target,
-                }),
-        };
+    // Скрываем крестик после 1 секунды (когда анимация завершится)
+    setTimeout(() => {
+        errorIcon.classList.remove('show-error');
+    }, 1000);
+}
 
-        if (jwtToken != null) {
-            path = `/api/wallet/${record_id}/`;
-        } else {
-            path = `/api/anonymous_wallet/${record_id}/`;
-        };
+function editRecordPatch() {
+    const income_or_expence = document.getElementById('income_or_expence_edit').value;
+    const target = document.getElementById('target_edit').value;
+    const record_id = document.getElementById('reference_to_record_id').value;
+    const csrfToken = getCSRFToken();
 
-        fetch(path, options_post)
-        .then(response => response.json())
+    const options_post = {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${jwtToken}`,  // Передаем токен в заголовке Authorization
+            'Content-Type': 'application/json',  // Указываем, что отправляем данные в формате JSON
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            "income_or_expence": income_or_expence,
+            "target": target,
+        }),
+    };
+
+    // Определяем путь в зависимости от наличия токена
+    let path = (jwtToken != null)
+        ? `/api/wallet/${record_id}/`
+        : `/api/anonymous_wallet/${record_id}/`;
+
+    console.log('path:', path);
+
+    // Выполняем запрос
+    fetch(path, options_post)
+        .then(response => {
+            if (!response.ok) { // Проверяем успешность ответа
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            console.log('record was changed:', data);
+            console.log('Record was changed:', data);
+
+            // Закрытие модального окна
             const modal = document.getElementById("editRecord");
             modal.style.display = "None";
-            fetchWallet();  // Refresh the list of books
-        })
-        .catch(error => console.error('Error creating book:', error));
 
-    }
+            // Обновление списка записей
+            fetchWallet();
+        })
+        .catch(error => {
+            console.error('Error editing record:', error);
+            showError();  // Показать крестик при ошибке
+
+            // Закрытие модального окна в случае ошибки
+            const modal = document.getElementById("editRecord");
+            modal.style.display = "None";
+        });
+}
 
 
 

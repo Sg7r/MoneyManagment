@@ -310,3 +310,41 @@ button.button_reaction{
     display: none;
 
 }
+
+
+
+
+
+
+
+
+/* Стили для крестика */
+.error-icon {
+    display: none;          /* По умолчанию скрыт */
+    font-size: 40px;        /* Размер крестика */
+    color: red;             /* Цвет крестика */
+    position: absolute;     /* Позиционирование */
+    top: 55%;              /* Примерное положение сверху */
+    right: 15%;            /* Примерное положение справа */
+    opacity: 0%;             /* Начальная прозрачность */
+    transition: opacity 1s; /* Плавное исчезновение */
+}
+
+/* Анимация появления крестика */
+.show-error {
+    display: block;         /* Показываем крестик */
+    animation: fadeInOut 1s ease-out; /* Анимация появления и исчезновения */
+}
+
+/* Анимация для появления и исчезновения */
+@keyframes fadeInOut {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
