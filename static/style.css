@@ -311,6 +311,16 @@ button.button_reaction{
 
 }
 
+.full_list {
+    display:block;
+}
+
+
+.short_list {
+    display:none;
+}
+
+
 
 
 

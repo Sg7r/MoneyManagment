@@ -23,9 +23,15 @@
                 <div class="item">
                     <h2>Last 10 transaction</h2>
                 </div>
+
                 <div class="item">
-                    <button id="paginator_view">Show all records</button>
+                    <form onsubmit="event.preventDefault(); show_or_hide_All_records()">
+                        {% csrf_token %}
+                        <button id="show_All_records_button">Show all records</button>
+                        <button id="show_short_list_button" style="display: none">Show 10 records</button>
+                     </form>
                 </div>
+
         </div>
         <div class="right-column">
         </div>
@@ -147,6 +153,7 @@
          console.log(path_url);
          const urlObj = new URL(path_url);
          const queryParams = urlObj.search;
+         console.log(queryParams);
 
          fetchWallet(queryParams);
 
@@ -308,17 +315,17 @@
     }
 
 
-     function showError() {
-    const errorIcon = document.getElementById('errorIcon');
+    function showError() {
+        const errorIcon = document.getElementById('errorIcon');
 
-    // Показываем крестик
-    errorIcon.classList.add('show-error');
+        // Показываем крестик
+        errorIcon.classList.add('show-error');
 
-    // Скрываем крестик после 1 секунды (когда анимация завершится)
-    setTimeout(() => {
-        errorIcon.classList.remove('show-error');
-    }, 1000);
-}
+        // Скрываем крестик после 1 секунды (когда анимация завершится)
+        setTimeout(() => {
+            errorIcon.classList.remove('show-error');
+        }, 1000);
+    }
 
 function editRecordPatch() {
     const income_or_expence = document.getElementById('income_or_expence_edit').value;
@@ -398,9 +405,9 @@ function editRecordPatch() {
             warning.style.display = "block"};
 
         if (request_param) {
-            path = `${path}${request_param}`
+            path = `${path}?${request_param}`
         };
-
+        console.log(path);
 
         fetch(path, options)
             .then(response => response.json())
@@ -438,6 +445,7 @@ function editRecordPatch() {
 
                 document.getElementById('previous_page').value = data.previous
                 document.getElementById('next_page').value = data.next
+                console.log('value=', data.next);
 
 
             })
@@ -458,11 +466,11 @@ function editRecordPatch() {
     }
 
 
-     function apply_filters() {
+    function apply_filters() {
         let request_param = form_filters_request();
         fetchWallet(request_param);
 
-     }
+    }
 
 
     // Function to create a record using the API
@@ -497,6 +505,32 @@ function editRecordPatch() {
         })
         .catch(error => console.error('Error creating book:', error));
     }
+
+
+    function show_or_hide_All_records(){
+        const is_pages_there = document.getElementById('next_page').value;
+        console.log ('is_pages_there', is_pages_there);
+        let request_param =''
+        if (is_pages_there == 'null') {
+            document.getElementById("show_All_records_button").style.display = "block";
+            document.getElementById("show_short_list_button").style.display = "none";
+        } else {
+            request_param = 'page_size=50'
+            document.getElementById("show_All_records_button").style.display = "none";
+            document.getElementById("show_short_list_button").style.display = "block";
+        }
+        fetchWallet(request_param);
+
+
+    }
+
+    function show_short_list(){
+        fetchWallet();
+        document.getElementById("show_All_records_button").style.display = "block";
+        document.getElementById("show_short_list_button").style.display = "none";
+    }
+
+
 
     // Load books when the page is loaded
     window.onload = fetchWallet(request_param);

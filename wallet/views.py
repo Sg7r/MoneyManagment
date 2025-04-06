@@ -65,7 +65,6 @@ class AnonymousList(viewsets.ModelViewSet):
 
 class WalletList(APIView):
     permission_classes = [IsAuthenticated]
-
     pagination_class = CustomPageNumberPagination
     filterset_class = WalletFilter
 
