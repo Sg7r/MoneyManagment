@@ -36,9 +36,11 @@
         modal.style.display = "block"; // Показываем модальное окно
 
         // Закрытие модального окна по клику на крестик
-        document.querySelector(".close").onclick = function() {
+        const closeButton = modal.querySelector(".close");
+        closeButton.onclick = function() {
             modal.style.display = "none";
         }
+
 
         // Закрытие модального окна по клику вне его
         window.onclick = function(event) {
@@ -51,13 +53,13 @@
         }
     };
 
-
     function showErrorModal() {
         const modal = document.getElementById("errorModalRegister");
         modal.style.display = "block"; // Показываем модальное окно
 
         // Закрытие модального окна по клику на крестик
-        document.querySelector(".close").onclick = function() {
+        const closeButton = modal.querySelector(".close");
+        closeButton.onclick = function() {
             modal.style.display = "none";
         }
 
