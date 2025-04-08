@@ -16,10 +16,6 @@ class RegisterView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
 
-    # def send_conf_email(self, data_dict):
-    #     print(send_confirmation_email.delay())
-    #     return Response()
-
     def get(self, request):
         if request.method == 'GET':
             return render(request, 'registration.html', {'type': 'register'})
@@ -28,10 +24,9 @@ class RegisterView(APIView):
         if request.method == 'POST':
             serializer = RegisterSerializer(data=request.data)
             if serializer.is_valid():
-                user = serializer.save()
-
                 data_dict = request.data
                 if 'username' in data_dict and 'password' in data_dict and 'email' in data_dict:
+                    user = serializer.save()
                     send_confirmation_email.apply_async(
                         kwargs={
                             'username': data_dict['username'],
@@ -39,25 +34,17 @@ class RegisterView(APIView):
                             'email': data_dict['email']
                         }
                     )
-                    # send_confirmation_email(
-                    #         data_dict['username'],
-                    #         data_dict['password'],
-                    #         data_dict['email']
-                    # )
+
+                    return Response({"message": "Registration successful"},
+                                    status=status.HTTP_201_CREATED)
                 else:
                     print("Missing required fields: username, password, or email")
 
 
-                token = Token.objects.create(user=user)
-                return Response({"token": token.key, "message": "Registration successful"},
-                                status=status.HTTP_201_CREATED)
+                # token = Token.objects.create(user=user)
+                # return Response({"token": token.key, "message": "Registration successful"},
+                #                 status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # @action(
-    #     detatil=True,
-    #     methods=['POST'],
-    # )
-
 
 
 class LoginView(APIView):
