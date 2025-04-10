@@ -17,8 +17,8 @@ class RegisterView(APIView):
     authentication_classes = []
 
     def get(self, request):
-        if request.method == 'GET':
-            return render(request, 'registration.html', {'type': 'register'})
+        # if request.method == 'GET':
+        return render(request, 'registration.html', {'type': 'register'})
 
     def post(self, request):
         if request.method == 'POST':
@@ -45,6 +45,17 @@ class RegisterView(APIView):
                 # return Response({"token": token.key, "message": "Registration successful"},
                 #                 status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserDeleteView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    def delete(self, request, pk):
+
+        user = User.objects.get(id=pk)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT) \
+
+
 
 
 class LoginView(APIView):
