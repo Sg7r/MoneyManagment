@@ -1,21 +1,3 @@
-# from rest_framework.test import APITestCase
-# from django.contrib.auth.models import User
-# from rest_framework_simplejwt.authentication import JWTAuthentication
-#
-# class TestCase(APITestCase):
-#     user = None
-#
-#     def set_user(self, user):
-#         self.user = user
-#         refresh = RefreshToken.for_user(user)
-#         access_token = str(refresh.access_token)
-#
-#         # Использование правильного заголовка для авторизации
-#         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
-#
-#         self.assertIsNotNone(access_token)
-
-
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth.models import User
@@ -77,4 +59,19 @@ class TestCase(APITestCase):
         response = self.client.delete(url, HTTP_X_CSRFTOKEN=self.CSRF_token)
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+    def test_login(self):
+
+        self.test_register_user()
+        url = reverse('login')
+
+        response = self.client.post(url,
+        {
+            'username': self.user.username,
+            'password': self.user.password
+        }, HTTP_X_CSRFTOKEN=self.CSRF_token)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
 
