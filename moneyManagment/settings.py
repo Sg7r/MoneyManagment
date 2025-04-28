@@ -78,6 +78,7 @@ DATABASES = {
         "USER": os.environ['DB_USER'],
         "PASSWORD": os.environ['DB_PASSWORD'],
         "HOST": "127.0.0.1",
+        # "HOST": "db",
         "PORT": "5432",
     }
 }
@@ -161,8 +162,8 @@ STATICFILES_DIRS = [
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # Physical directory on the server
 
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
