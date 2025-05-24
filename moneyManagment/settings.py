@@ -73,8 +73,13 @@ DATABASES = {
         "NAME": os.environ['DB_NAME'],
         "USER": os.environ['DB_USER'],
         "PASSWORD": os.environ['DB_PASSWORD'],
-        # "HOST": "127.0.0.1",
-        "HOST": "db",
+        
+        # Для тестов
+        "HOST": "127.0.0.1",
+        
+        # Для контейнеризации
+        # "HOST": "db",
+        
         "PORT": "5432",
     }
 }
@@ -154,9 +159,14 @@ CSRF_COOKIE_SECURE = True  # Если ваше приложение работа
 CSRF_COOKIE_HTTPONLY = False  # Защищает токен от доступа через JavaScript (можно использовать для усиленной безопасности)
 CSRF_COOKIE_NAME = 'csrftoken'  # На всякий случай, если вам нужно переопределить название заголовка
 
+# Для тестов
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+# Для контерйнеризации
+# CELERY_BROKER_URL = 'redis://redis:6379/0'    
+# CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
