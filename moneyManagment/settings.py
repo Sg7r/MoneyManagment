@@ -8,10 +8,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -77,8 +73,8 @@ DATABASES = {
         "NAME": os.environ['DB_NAME'],
         "USER": os.environ['DB_USER'],
         "PASSWORD": os.environ['DB_PASSWORD'],
-        "HOST": "127.0.0.1",
-        # "HOST": "db",
+        # "HOST": "127.0.0.1",
+        "HOST": "db",
         "PORT": "5432",
     }
 }
@@ -116,6 +112,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    BASE_DIR / "static",        
+]
+
+
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -125,9 +130,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'moneyManagment.authentication.CookieJWTAuthentication',
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
-        # 'rest_framework.authentication.BasicAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',  # разрешаем доступ всем
@@ -136,8 +138,6 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',  # Подключаем фильтрацию
     ],
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    # 'PAGE_SIZE': 10,  # Устанавливаем стандартный размер страницы — 10 записей
 }
 
 SIMPLE_JWT = {
@@ -153,13 +153,6 @@ SIMPLE_JWT = {
 CSRF_COOKIE_SECURE = True  # Если ваше приложение работает через HTTPS
 CSRF_COOKIE_HTTPONLY = False  # Защищает токен от доступа через JavaScript (можно использовать для усиленной безопасности)
 CSRF_COOKIE_NAME = 'csrftoken'  # На всякий случай, если вам нужно переопределить название заголовка
-
-# CSRF_COOKIE_SECURE = False  # Для отключения CSRF на фронте (не рекомендуется для production)
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Например, если у вас есть папка static в корне проекта
-]
-# MEDIA_URL = '/media/'  # URL to access media files in the browser
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  # Physical directory on the server
 
 
 CELERY_BROKER_URL = 'redis://redis:6379/0'
