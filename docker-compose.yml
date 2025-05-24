@@ -1,19 +1,31 @@
-version: '3.9'
 
 services:
   web:
     build: .
+    image: viache5lav/moneymanagment-web
     command: gunicorn moneyManagment.wsgi:application --bind 0.0.0.0:8000
+    entrypoint: ["/app/entrypoint.sh"]
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
+      - ./staticfiles:/app/staticfiles
     depends_on:
       - db
       - redis
 
+  nginx:
+    image: nginx:1.25
+    ports:
+      - "80:80"
+    volumes:
+      - ./staticfiles:/app/staticfiles:ro  # Изменено с static_volume
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - web
+
   celery:
     build: .
+    image: viache5lav/moneymanagment-celery
+    entrypoint: ""
     command: celery -A moneyManagment worker --loglevel=info
     volumes:
       - .:/app
