@@ -11,6 +11,10 @@ done
 echo "Applying database migrations..."
 python manage.py migrate --noinput
 
+until python manage.py shell -c "from django.db import connection; connection.ensure_connection()"; do
+  sleep 1
+done
+
 echo "Creating superuser..."
 DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME:-admin}
 DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL:-admin@example.com}
