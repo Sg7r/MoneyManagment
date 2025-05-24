@@ -19,14 +19,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .pagination import CustomPageNumberPagination
 
 
-class ActionsList(viewsets.ModelViewSet):
+class GeneralActionsList(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-
     queryset = Wallet.objects.all()
     serializer_class = WalletSerializer
 
 
-class AnonymousList(viewsets.ModelViewSet):
+class AnonymousListBAsicActions(viewsets.ModelViewSet):
     permission_classes = []
     authentication_classes = []
 
@@ -42,7 +41,7 @@ class AnonymousList(viewsets.ModelViewSet):
 
         return Response(status=status.HTTP_403_FORBIDDEN)
 
-   # Logic for update if not logged in
+    # Logic for update if not logged in
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
@@ -75,11 +74,10 @@ class WalletList(APIView):
         return filter_backend.filter_queryset(request, queryset, self)
 
     def get(self, request, *args, **kwargs):
-
         user = request.user
         user_all_objects = Wallet.objects.filter(user=user)
 
-        queryset =user_all_objects.order_by('-data')
+        queryset = user_all_objects.order_by('-data')
         queryset = self.apply_filters(request, queryset)
 
         paginator = CustomPageNumberPagination()
@@ -105,7 +103,7 @@ class WalletList(APIView):
         return Response(response_data)
 
 
-class AnonymusList(APIView):
+class AnonymousList(APIView):
     permission_classes = []
     authentication_classes = []
 
@@ -120,7 +118,7 @@ class AnonymusList(APIView):
     def get(self, request, *args, **kwargs):
         delete_anonymous_records_after_10_minutes()
         # Берем последние 10
-        username = 'worker'
+        username = 'admin'
         worker = User.objects.get(username=username)
         queryset = Wallet.objects.filter(Q(user=worker) | Q(user__isnull=True)).order_by('-data')
 
@@ -152,7 +150,8 @@ def index(request):
 
 
 def delete_anonymous_records_after_10_minutes():
+    # cache_key = f"task_{task_name}_{hash(frozenset(params.items()))}"
     records_to_delete = Wallet.objects.filter(user__isnull=True).values_list('id', flat=True)
     if records_to_delete.exists():
-        eta = timezone.now() + timedelta(seconds=300)
+        eta = timezone.now() + timedelta(seconds=20)
         result = delete_anonymous_records.apply_async(args=[list(records_to_delete)], eta=eta)

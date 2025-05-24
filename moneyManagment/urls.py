@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from wallet.views import ActionsList
+from wallet.views import GeneralActionsList
 from monthly_bills.views import MonthlyBillsList
 from accounts.views import RegisterView
 # from accounts.views import CreateUserView
@@ -11,7 +11,7 @@ from rest_framework_simplejwt import views as jwt_views
 
 
 default_router = DefaultRouter()
-default_router.register('api/wallet', ActionsList, 'actions_list')
+default_router.register('api/wallet', GeneralActionsList, 'actions_list')
 default_router.register('api/monthly_bills', MonthlyBillsList, 'monthly_bills_list')
 # default_router.register('api/register', CreateUserView, 'Create_UserView')
 

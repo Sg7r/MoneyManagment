@@ -3,8 +3,8 @@ from . import views
 from rest_framework.routers import DefaultRouter
 
 default_router = DefaultRouter()
-default_router.register(r'wallet', views.ActionsList, basename='wallet'),
-default_router.register(r'anonymous_wallet', views.AnonymousList, basename='_anonymous_wallet')
+default_router.register(r'wallet', views.GeneralActionsList, basename='wallet'),
+default_router.register(r'anonymous_wallet', views.AnonymousListBAsicActions, basename='_anonymous_wallet')
 
 urlpatterns = [
     path('', views.index, name='index'),  # Рендерим HTML-страницу
@@ -12,7 +12,7 @@ urlpatterns = [
     # path('home/', views.HomeView.as_view()),
     # path('total/', views.WalletSumView.as_view()),
     path('wallet_record_list/', views.WalletList.as_view()),
-    path('anonymous_record_list/', views.AnonymusList.as_view())
+    path('anonymous_record_list/', views.AnonymousList.as_view())
 ]
 
 
